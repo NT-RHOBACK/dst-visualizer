@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DST Visualizer v3.20</title>
+<title>DST Visualizer v3.21</title>
 <!-- Inlined pdf.js v3.11.174 — zero external dependencies -->
 <script>
 /**
@@ -185,7 +185,7 @@ textarea.field-input{resize:vertical;min-height:65px;line-height:1.45}
 
 <div class="hdr">
   <div>
-    <div class="hdr-title">DST Visualizer <span style="font-size:10px;font-weight:400;opacity:.35;letter-spacing:.5px">v3.20</span></div>
+    <div class="hdr-title">DST Visualizer <span style="font-size:10px;font-weight:400;opacity:.35;letter-spacing:.5px">v3.21</span></div>
     <div class="hdr-sub">Drop a DST · assign thread colors · download worksheet</div>
   </div>
   <div class="hdr-badge">Rhoback Embroidery</div>
@@ -1295,17 +1295,9 @@ function parseDST(buffer) {
       out.push(x, y, 1);                         // STITCH (default)
     }
   }
-  // ── Heuristic: promote jumps to sequins in "sequin-heavy" stops ────
-  // Some Wilcom files encode sequins as plain JUMP records inside
-  // designated sequin stops, not as the standard 0x43 sequin opcode.
-  // Detection: a stop with > 20% jumps relative to stitches+jumps is
-  // treated as a sequin stop, and its jump records (cmd=0) are promoted
-  // to sequin drops (cmd=3). Normal designs run < 5% jumps per stop,
-  // so this never triggers for them. Twin Sequin Flower 2 has stops
-  // with 22% and 33% jumps that Wilcom confirms are sequin rows.
+  // Heuristic — promote jumps to sequins in stops where jumps > 20% of records
   (function promoteSequinHeavyJumps() {
     if (!out.length) return;
-    // First pass: tally stitches/jumps/sequins per stop
     const stops = [{stitches:0, jumps:0, sequins:0, indices:[]}];
     let si = 0;
     for (let k = 0; k + 2 < out.length; k += 3) {
@@ -1315,24 +1307,14 @@ function parseDST(buffer) {
       else if (cmd === 0) { stops[si].jumps++; stops[si].indices.push(k+2); }
       else if (cmd === 3) stops[si].sequins++;
     }
-    // Second pass: promote jumps in sequin-heavy stops
     let promoted = 0;
     for (const s of stops) {
       const denom = s.stitches + s.jumps;
-      if (denom < 20) continue;            // skip tiny stops (noise)
-      if (s.jumps / denom < 0.20) continue; // not a sequin stop
-      for (const idx of s.indices) {
-        out[idx] = 3;                       // jump → sequin
-        promoted++;
-      }
+      if (denom < 20) continue;
+      if (s.jumps / denom < 0.20) continue;
+      for (const idx of s.indices) { out[idx] = 3; promoted++; }
     }
-    if (promoted > 0) {
-      sequinCount += promoted;
-      // Caller can inspect this to phrase the warning differently
-      window.__lastPromotedJumps = promoted;
-    } else {
-      window.__lastPromotedJumps = 0;
-    }
+    sequinCount += promoted;
   })();
 
   return { data: out, colorChanges, sequinCount, wIn, hIn, wMM, hMM, wrapped, headerStart };
@@ -1396,20 +1378,28 @@ function loadFile(file) {
       res.hIn ? res.hIn + '"H' : null
     ].filter(Boolean).map(t => `<div class="stat-badge">${t}</div>`).join('');
 
-    // Wilcom-wrapped DST notice — different from sequin warning
+    // ── Banner logic (v3.21) ──────────────────────────────────────
+    // Info banner: technical wrap-detection detail (blue)
+    // Warning banner: production concern — shows when EITHER sequins
+    //   were detected OR file is wrapped (wrapped files often store
+    //   sequin/bling metadata we can\'t read). Copy adapts to case.
     const ib = document.getElementById('infoBanner');
     if (res.wrapped) {
       ib.style.display = 'flex';
-      ib.innerHTML = '<span class="wb-ico">ℹ️</span><span><strong>Wilcom-wrapped DST detected</strong> — real stitch data found ' + res.headerStart.toLocaleString() + ' bytes into the file (behind a proprietary container). Stitches and color stops render correctly here. <strong>Note:</strong> these wrapped files often hold sequin / bling metadata that won\'t appear in this preview — verify the full design in Wilcom.</span>';
+      ib.innerHTML = '<span class="wb-ico">ℹ️</span><span><strong>Wilcom-wrapped DST detected</strong> — real stitch data found ' + res.headerStart.toLocaleString() + ' bytes into the file (behind a proprietary container). Stitches and color stops render correctly here.</span>';
     } else {
       ib.style.display = 'none';
     }
 
-    // Sequin warning — visualizer doesn't render sequins, recommend Wilcom for verification
     const wb = document.getElementById('warnBanner');
-    if (res.sequinCount > 0) {
+    const hasSequins      = res.sequinCount > 0;
+    const wrappedWithout  = res.wrapped && !hasSequins;
+    if (hasSequins) {
       wb.style.display = 'flex';
-      wb.innerHTML = '<span class="wb-ico">⚠️</span><span><strong>Potential issue — sequins / blings detected.</strong> Rhoback doesn\'t produce designs with sequins or rhinestones. This DST contains ' + res.sequinCount.toLocaleString() + ' drop record' + (res.sequinCount !== 1 ? 's' : '') + ' (rendered here as filled circles), and may contain additional decorations in wrapper metadata we can\'t read. <strong>Open this file in Wilcom to verify</strong>, and confirm with the customer before sending to production.</span>';
+      wb.innerHTML = '<span class="wb-ico">⚠️</span><span><strong>Potential issue — sequins / blings detected.</strong> Rhoback doesn\'t produce designs with sequins or rhinestones. This DST contains ' + res.sequinCount.toLocaleString() + ' drop record' + (res.sequinCount !== 1 ? 's' : '') + ' (rendered here as filled circles)' + (res.wrapped ? ', plus likely additional decorations in wrapper metadata we can\'t read' : '') + '. <strong>Open this file in Wilcom to verify</strong>, and confirm with the customer before sending to production.</span>';
+    } else if (wrappedWithout) {
+      wb.style.display = 'flex';
+      wb.innerHTML = '<span class="wb-ico">⚠️</span><span><strong>Potential issue — wrapped DST file.</strong> Rhoback doesn\'t produce designs with sequins or rhinestones. This file\'s wrapper metadata may contain sequins, blings, or other decorations not visible in the preview above. <strong>Open this file in Wilcom to verify</strong> the full design, and confirm with the customer before sending to production.</span>';
     } else {
       wb.style.display = 'none';
     }
