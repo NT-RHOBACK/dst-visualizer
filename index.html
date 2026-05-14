@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DST Visualizer v3.21</title>
+<title>DST Visualizer v3.22</title>
 <!-- Inlined pdf.js v3.11.174 — zero external dependencies -->
 <script>
 /**
@@ -185,7 +185,7 @@ textarea.field-input{resize:vertical;min-height:65px;line-height:1.45}
 
 <div class="hdr">
   <div>
-    <div class="hdr-title">DST Visualizer <span style="font-size:10px;font-weight:400;opacity:.35;letter-spacing:.5px">v3.21</span></div>
+    <div class="hdr-title">DST Visualizer <span style="font-size:10px;font-weight:400;opacity:.35;letter-spacing:.5px">v3.22</span></div>
     <div class="hdr-sub">Drop a DST · assign thread colors · download worksheet</div>
   </div>
   <div class="hdr-badge">Rhoback Embroidery</div>
@@ -1287,7 +1287,13 @@ function parseDST(buffer) {
       colorChanges++;
       out.push(x, y, 2);
     } else if ((b2 & 0x83) === 0x83) {           // JUMP/MOVE  (bits 0,1,7)
-      out.push(x, y, 0);
+      // v3.22 — split jumps by coord-weight bits. Small jumps (no
+      // weight bits in b2) can only reach ~5.6mm and are typical of
+      // sequin-chain spacing. Large jumps (b2 & 0x3C != 0) can reach
+      // ~12mm and are typically real positional moves between sections.
+      // Heuristic later promotes only small jumps in sequin-heavy stops.
+      const isSmallJump = (b2 & 0x3C) === 0;
+      out.push(x, y, isSmallJump ? 4 : 0);
     } else if ((b2 & 0x43) === 0x43) {           // SEQUIN / BLING drop event; cmd=3 so renderer can show it
       sequinCount++;
       out.push(x, y, 3);
@@ -1295,26 +1301,36 @@ function parseDST(buffer) {
       out.push(x, y, 1);                         // STITCH (default)
     }
   }
-  // Heuristic — promote jumps to sequins in stops where jumps > 20% of records
+  // Heuristic — in sequin-heavy stops, promote SMALL jumps (cmd=4)
+  // to sequins (cmd=3). Large jumps (cmd=0) stay as jumps. A stop
+  // is sequin-heavy if (small+large jumps) / (stitches+jumps) > 20%.
   (function promoteSequinHeavyJumps() {
     if (!out.length) return;
-    const stops = [{stitches:0, jumps:0, sequins:0, indices:[]}];
+    const stops = [{stitches:0, smallJumps:0, largeJumps:0, sequins:0, smallIdx:[]}];
     let si = 0;
     for (let k = 0; k + 2 < out.length; k += 3) {
       const cmd = out[k+2];
-      if (cmd === 2) { stops.push({stitches:0, jumps:0, sequins:0, indices:[]}); si++; continue; }
+      if (cmd === 2) { stops.push({stitches:0, smallJumps:0, largeJumps:0, sequins:0, smallIdx:[]}); si++; continue; }
       if (cmd === 1) stops[si].stitches++;
-      else if (cmd === 0) { stops[si].jumps++; stops[si].indices.push(k+2); }
+      else if (cmd === 0) stops[si].largeJumps++;
+      else if (cmd === 4) { stops[si].smallJumps++; stops[si].smallIdx.push(k+2); }
       else if (cmd === 3) stops[si].sequins++;
     }
     let promoted = 0;
     for (const s of stops) {
-      const denom = s.stitches + s.jumps;
+      const denom = s.stitches + s.smallJumps + s.largeJumps;
       if (denom < 20) continue;
-      if (s.jumps / denom < 0.20) continue;
-      for (const idx of s.indices) { out[idx] = 3; promoted++; }
+      const jumpRatio = (s.smallJumps + s.largeJumps) / denom;
+      if (jumpRatio < 0.20) continue;
+      // Promote ONLY small jumps — large jumps are real positional moves
+      for (const idx of s.smallIdx) { out[idx] = 3; promoted++; }
     }
     sequinCount += promoted;
+    // Demote any leftover cmd=4 (in non-sequin-heavy stops) back to cmd=0
+    // so the rest of the app treats them as ordinary jumps.
+    for (let k = 0; k + 2 < out.length; k += 3) {
+      if (out[k+2] === 4) out[k+2] = 0;
+    }
   })();
 
   return { data: out, colorChanges, sequinCount, wIn, hIn, wMM, hMM, wrapped, headerStart };
@@ -1378,11 +1394,8 @@ function loadFile(file) {
       res.hIn ? res.hIn + '"H' : null
     ].filter(Boolean).map(t => `<div class="stat-badge">${t}</div>`).join('');
 
-    // ── Banner logic (v3.21) ──────────────────────────────────────
-    // Info banner: technical wrap-detection detail (blue)
-    // Warning banner: production concern — shows when EITHER sequins
-    //   were detected OR file is wrapped (wrapped files often store
-    //   sequin/bling metadata we can\'t read). Copy adapts to case.
+    // Banner logic (v3.21+): info banner for wrap detection, warning
+    // banner whenever sequins were detected OR file is wrapped.
     const ib = document.getElementById('infoBanner');
     if (res.wrapped) {
       ib.style.display = 'flex';
@@ -1392,8 +1405,8 @@ function loadFile(file) {
     }
 
     const wb = document.getElementById('warnBanner');
-    const hasSequins      = res.sequinCount > 0;
-    const wrappedWithout  = res.wrapped && !hasSequins;
+    const hasSequins     = res.sequinCount > 0;
+    const wrappedWithout = res.wrapped && !hasSequins;
     if (hasSequins) {
       wb.style.display = 'flex';
       wb.innerHTML = '<span class="wb-ico">⚠️</span><span><strong>Potential issue — sequins / blings detected.</strong> Rhoback doesn\'t produce designs with sequins or rhinestones. This DST contains ' + res.sequinCount.toLocaleString() + ' drop record' + (res.sequinCount !== 1 ? 's' : '') + ' (rendered here as filled circles)' + (res.wrapped ? ', plus likely additional decorations in wrapper metadata we can\'t read' : '') + '. <strong>Open this file in Wilcom to verify</strong>, and confirm with the customer before sending to production.</span>';
@@ -1754,7 +1767,7 @@ function redraw() {
   let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
   for (let i = 0; i < stitchData.length; i += 3) {
     const c = stitchData[i+2];
-    if (c === 1 || c === 3) {
+    if (c === 1 || c === 3 || c === 4) {
       const sx=stitchData[i], sy=stitchData[i+1];
       if(sx<x0)x0=sx; if(sx>x1)x1=sx;
       if(sy<y0)y0=sy; if(sy>y1)y1=sy;
@@ -1776,7 +1789,7 @@ function redraw() {
   for (let i = 0; i < stitchData.length; i += 3) {
     const rx2 = stitchData[i], ry2 = stitchData[i+1], cmd = stitchData[i+2];
     if (cmd === 2) { ci = Math.min(ci+1, colors.length-1); px=py=null; continue; }
-    if (cmd === 0 || cmd === 3) { px=py=null; continue; }   // jump OR sequin breaks the line
+    if (cmd === 0 || cmd === 3 || cmd === 4) { px=py=null; continue; }   // jump, sequin, or small-jump all break the line
 
     const cx = (rx2-x0)*sc + xOff;
     const cy = (ry2-y0)*sc + yOff;
@@ -1796,7 +1809,7 @@ function redraw() {
   // DST units are 0.1 mm → 18 units ≈ 1.8 mm radius — a middle ground
   // between ss6 (~0.95 mm) blings and full 5 mm sequins. DST has no
   // size metadata, so this is always an approximation.
-  const sqR  = Math.max(2.5, sc * 18);
+  const sqR  = Math.max(2.5, sc * 22);
   const sqLW = Math.max(0.8, sc * 1.8);
   let sqCi = 0;
   for (let i = 0; i < stitchData.length; i += 3) {
@@ -1894,7 +1907,7 @@ function getCanvasDataURL() {
   let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
   for (let i = 0; i < stitchData.length; i += 3) {
     const c=stitchData[i+2];
-    if (c === 1 || c === 3) {
+    if (c === 1 || c === 3 || c === 4) {
       const sx=stitchData[i], sy=stitchData[i+1];
       if(sx<x0)x0=sx; if(sx>x1)x1=sx;
       if(sy<y0)y0=sy; if(sy>y1)y1=sy;
@@ -1914,7 +1927,7 @@ function getCanvasDataURL() {
   for (let i = 0; i < stitchData.length; i += 3) {
     const rx2=stitchData[i], ry2=stitchData[i+1], cmd=stitchData[i+2];
     if (cmd===2){ci=Math.min(ci+1,colors.length-1);px=py=null;continue;}
-    if (cmd===0 || cmd===3){px=py=null;continue;}   // jump or sequin breaks the line
+    if (cmd===0 || cmd===3 || cmd===4){px=py=null;continue;}   // jump, sequin, small-jump all break
     const cx=(rx2-x0)*sc+xOff, cy=(ry2-y0)*sc+yOff;
     if (px!==null){
       offCtx.beginPath();offCtx.moveTo(px+.5,py+.5);offCtx.lineTo(cx+.5,cy+.5);
@@ -1926,7 +1939,7 @@ function getCanvasDataURL() {
   }
 
   // Pass 2 — sequins / blings overlay: filled circles in current stop color
-  const sqR  = Math.max(2.5*SCALE, sc * 18);
+  const sqR  = Math.max(2.5*SCALE, sc * 22);
   const sqLW = Math.max(0.8*SCALE, sc * 1.8);
   let sqCi = 0;
   for (let i = 0; i < stitchData.length; i += 3) {
