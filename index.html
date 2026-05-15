@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DST Visualizer v3.22</title>
-<!-- Inlined pdf.js v3.11.174 — zero external dependencies -->
+<title>DST Visualizer v3.24</title>
+<!-- Inlined pdf.js v3.11.174 -->
 <script>
 /**
  * @licstart The following is the entire license notice for the
@@ -42,25 +42,22 @@
 </script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f0f2f6;min-height:100vh;color:#1a1a2e;font-size:13px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f0f2f6;min-height:100vh;color:#1a1a2e;font-size:14px;line-height:1.45}
 
 /* ─── Header ─── */
-.hdr{background:#0D1E50;color:#fff;padding:12px 24px;display:flex;align-items:center;gap:12px}
-.hdr-title{font-size:14px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase}
-.hdr-sub{font-size:11px;opacity:.5;letter-spacing:.2px;margin-top:1px}
-.hdr-badge{margin-left:auto;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:4px;padding:3px 10px;font-size:10px;letter-spacing:.8px;text-transform:uppercase;opacity:.75}
+.hdr{background:linear-gradient(135deg,#0D1E50 0%,#1a2d6b 100%);color:#fff;padding:16px 28px;display:flex;align-items:center;gap:12px;border-bottom:3px solid #16a34a;box-shadow:0 2px 6px rgba(13,30,80,.18)}
+.hdr-title{font-size:17px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase}
+.hdr-sub{font-size:12px;opacity:.65;letter-spacing:.3px;margin-top:3px}
+.hdr-badge{margin-left:auto;background:rgba(22,163,74,.18);border:1px solid rgba(22,163,74,.45);border-radius:5px;padding:4px 12px;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;opacity:.95;color:#a7f0c0}
 
 /* ─── Layout ─── */
-.zones-top{display:flex;gap:18px;padding:14px 18px 0 18px;max-width:1320px;margin:0 auto;align-items:stretch}
+.zones-top{display:flex;gap:18px;padding:14px 18px 0 18px;max-width:1240px;margin:0 auto;align-items:stretch}
 .zones-top > .card{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
 @media(max-width:800px){.zones-top{flex-direction:column}}
-.main{display:flex;gap:18px;padding:18px;max-width:1320px;margin:0 auto;align-items:flex-start}
+.main{display:flex;gap:18px;padding:18px;max-width:1240px;margin:0 auto;align-items:flex-start}
 @media(max-width:800px){.main{flex-direction:column}}
 .left{flex:0 0 auto;display:flex;flex-direction:column;gap:10px}
-.right{flex:1;min-width:0;display:flex;flex-direction:row;gap:12px;align-items:flex-start}
-.right > .card{flex:1;min-width:0}
-.right > .card.stops-card{flex:0 0 320px}
-@media(max-width:1100px){.right{flex-direction:column}.right > .card.stops-card{flex:1 1 auto}}
+.right{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
 
 /* ─── Canvas shell ─── */
 .canvas-shell{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.07);position:relative;width:520px;height:520px}
@@ -71,6 +68,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 
 /* canvas controls */
 .ctrl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+/* always-on caption below canvas (v3.24) */
+.canvas-note{font-size:11px;color:#888;text-align:center;padding:6px 10px;font-style:italic;line-height:1.4;background:#f8f9fc;border:1px solid #eaedf5;border-radius:6px;margin-top:4px}
+.canvas-note.warn{color:#92400e;background:#fef3c7;border-color:#f59e0b;font-style:normal;font-weight:600}
 .ctrl-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#777}
 .bg-opts{display:flex;gap:4px}
 .bg-btn{width:24px;height:24px;border-radius:4px;border:2px solid transparent;cursor:pointer;transition:border-color .12s}
@@ -79,7 +79,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .bg-white{background:#fff;border-color:#d1d5db}
 .bg-lgray{background:#e4e6ee;border-color:#d1d5db}
 .bg-dark{background:#1a1a2e;border-color:#666}
-.bg-xp{background:radial-gradient(circle at 40% 30%,rgba(255,255,255,0.95),rgba(210,217,230,0.85))}
+.bg-xp{background:linear-gradient(135deg,rgba(255,255,255,.85) 0%,rgba(220,230,255,.55) 45%,rgba(200,215,245,.45) 100%);box-shadow:inset 0 1px 2px rgba(255,255,255,.6),inset 0 -1px 2px rgba(120,140,200,.18)}
 .flip-chk{font-size:11px;color:#666;cursor:pointer;display:flex;align-items:center;gap:4px;user-select:none}
 .flip-chk input{accent-color:#6366f1;cursor:pointer}
 .divider-v{width:1px;height:20px;background:#e2e8f0;flex-shrink:0}
@@ -110,7 +110,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 
 /* ─── Cards ─── */
 .card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:13px 15px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#666;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .card-title-note{font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:#aaa;margin-left:auto}
 
 /* ─── Thread type toggle ─── */
@@ -125,9 +125,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .drop-zone:hover,.drop-zone.over{border-color:#6366f1;background:#f5f5ff}
 .drop-zone.loaded{border-color:#22c55e;background:#f0fff4}
 .drop-icon{font-size:18px;margin-bottom:2px;opacity:.5}
-.drop-lbl{font-size:12px;font-weight:600;color:#444}
+.drop-lbl{font-size:13px;font-weight:600;color:#444}
 .drop-sub{font-size:11px;color:#888;margin-top:2px}
-.drop-fname{font-size:11px;color:#16a34a;font-weight:600;margin-top:3px}
+.drop-fname{font-size:12px;color:#16a34a;font-weight:600;margin-top:3px}
 /* compact secondary drop zone for the optional PDF color card */
 .drop-zone-pdf{padding:10px 12px;border-color:#e5d4f0}
 .drop-zone-pdf:hover,.drop-zone-pdf.over{border-color:#a855f7;background:#faf5ff}
@@ -143,17 +143,17 @@ input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 .info-banner strong{color:#0c4a6e}
 .warn-banner .wb-ico{font-size:14px;line-height:1;flex-shrink:0;margin-top:1px}
 .warn-banner strong{color:#78350f}
-.stops-toggle{background:transparent;border:1px solid #d1d5db;border-radius:4px;width:22px;height:18px;cursor:pointer;font-size:13px;color:#666;padding:0;display:inline-flex;align-items:center;justify-content:center;font-family:inherit;line-height:1;font-weight:700;transition:background .12s}
+.stops-toggle{background:transparent;border:1px solid #d1d5db;border-radius:4px;width:24px;height:22px;cursor:pointer;font-size:10px;color:#666;padding:0;display:inline-flex;align-items:center;justify-content:center;font-family:inherit;line-height:1;transition:background .12s;margin-left:auto}
 .stops-toggle:hover{background:#f0f0f0;color:#333}
 
 /* ─── Color stops ─── */
 .stop-list{display:flex;flex-direction:column;gap:5px}
-.stop-row{display:flex;align-items:center;gap:5px;padding:5px 7px;border-radius:6px;background:#f8f9fc;border:1px solid #eaedf5}
-.stop-num{font-size:10px;color:#aaa;width:18px;flex-shrink:0;font-weight:700;text-align:right}
-.swatch-btn{width:22px;height:22px;border-radius:4px;border:2px solid rgba(0,0,0,.1);flex-shrink:0;position:relative;pointer-events:none}
-.stop-select{flex:1;min-width:0;max-width:150px;padding:5px 7px;border:1px solid #d1d5db;border-radius:5px;font-size:10px;font-family:inherit;color:#1a1a2e;background:#fff;cursor:pointer;text-overflow:ellipsis}
+.stop-row{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;background:#f8f9fc;border:1px solid #eaedf5}
+.stop-num{font-size:11px;color:#aaa;width:22px;flex-shrink:0;font-weight:700;text-align:right}
+.swatch-btn{width:26px;height:26px;border-radius:5px;border:2px solid rgba(0,0,0,.1);flex-shrink:0;position:relative;pointer-events:none}
+.stop-select{flex:1;min-width:0;padding:5px 7px;border:1px solid #d1d5db;border-radius:5px;font-size:11px;font-family:inherit;color:#1a1a2e;background:#fff;cursor:pointer}
 .stop-select:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.12)}
-.stop-code-in{width:54px;padding:4px 5px;border:1px solid #d1d5db;border-radius:5px;font-size:10px;font-family:monospace;text-align:center;color:#1a1a2e;background:#fff;flex-shrink:0}
+.stop-code-in{width:62px;padding:5px 6px;border:1px solid #d1d5db;border-radius:5px;font-size:11px;font-family:monospace;text-align:center;color:#1a1a2e;background:#fff;flex-shrink:0}
 .stop-code-in:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.12)}
 .stop-warn{font-size:9px;color:#f59e0b;flex-shrink:0}
 .stops-empty{text-align:center;padding:16px;color:#bbb;font-size:12px}
@@ -161,16 +161,16 @@ input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 /* ─── Order form ─── */
 .field-row{display:flex;flex-direction:column;gap:3px;margin-bottom:9px}
 .field-row:last-child{margin-bottom:0}
-.field-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#888}
-.field-input{padding:7px 9px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-family:inherit;color:#1a1a2e;background:#fff}
+.field-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#666}
+.field-input{padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1a1a2e;background:#fff}
 .field-input:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.12)}
 textarea.field-input{resize:vertical;min-height:65px;line-height:1.45}
 .field-row-2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px}
-.field-select{padding:7px 9px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-family:inherit;color:#1a1a2e;background:#fff;cursor:pointer;width:100%}
+.field-select{padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1a1a2e;background:#fff;cursor:pointer;width:100%}
 .field-select:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.12)}
 
 /* compact thread type toggle (inline in card-title) */
-.tt-mini{display:flex;gap:0;border:1px solid #d1d5db;border-radius:5px;overflow:hidden;margin-left:auto}
+.tt-mini{display:flex;gap:0;border:1px solid #d1d5db;border-radius:5px;overflow:hidden}
 .tt-mini-btn{padding:2px 9px;font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:#aaa;transition:background .12s,color .12s;font-family:inherit}
 .tt-mini-btn:first-child{border-right:1px solid #d1d5db}
 .tt-mini-btn.active{background:#0D1E50;color:#fff}
@@ -185,7 +185,7 @@ textarea.field-input{resize:vertical;min-height:65px;line-height:1.45}
 
 <div class="hdr">
   <div>
-    <div class="hdr-title">DST Visualizer <span style="font-size:10px;font-weight:400;opacity:.35;letter-spacing:.5px">v3.22</span></div>
+    <div class="hdr-title">DST Visualizer <span style="font-size:11px;font-weight:400;opacity:.4;letter-spacing:.5px;margin-left:6px">v3.24</span></div>
     <div class="hdr-sub">Drop a DST · assign thread colors · download worksheet</div>
   </div>
   <div class="hdr-badge">Rhoback Embroidery</div>
@@ -197,7 +197,7 @@ textarea.field-input{resize:vertical;min-height:65px;line-height:1.45}
     <!-- 1. DST -->
     <div class="drop-zone" id="dropZone">
       <input type="file" accept=".dst,.DST" id="fileInput">
-      <div class="drop-icon" style="font-size:16px">📂</div>
+      <div class="drop-icon" style="font-size:18px">📂</div>
       <div class="drop-lbl">1 · Drop DST file</div>
       <div class="drop-sub">.dst only</div>
       <div class="drop-fname" id="dropFname"></div>
@@ -210,7 +210,7 @@ textarea.field-input{resize:vertical;min-height:65px;line-height:1.45}
     <!-- 2. Color card PDF (optional) -->
     <div class="drop-zone drop-zone-pdf" id="dropZonePdf">
       <input type="file" accept=".pdf,.PDF" id="fileInputPdf">
-      <div class="drop-icon" style="font-size:14px">🎨</div>
+      <div class="drop-icon" style="font-size:16px">🎨</div>
       <div class="drop-lbl">2 · Drop color card PDF</div>
       <div class="drop-sub">auto-colors stops · optional</div>
       <div class="drop-fname" id="dropFnamePdf"></div>
@@ -238,7 +238,7 @@ textarea.field-input{resize:vertical;min-height:65px;line-height:1.45}
         <div class="bg-btn bg-white active" title="White" onclick="setBg('white',this)"></div>
         <div class="bg-btn bg-lgray" title="Light Gray" onclick="setBg('lgray',this)"></div>
         <div class="bg-btn bg-dark" title="Dark" onclick="setBg('dark',this)"></div>
-        <div class="bg-btn bg-xp" title="Frosted Glass" onclick="setBg('xp',this)"></div>
+        <div class="bg-btn bg-xp" title="Liquid Glass" onclick="setBg('xp',this)"></div>
       </div>
       <div class="divider-v"></div>
       <button class="btn-md btn-md-navy" id="btnDl" onclick="downloadPNG()" disabled>↓ PNG</button>
@@ -247,29 +247,20 @@ textarea.field-input{resize:vertical;min-height:65px;line-height:1.45}
       <button class="btn-md btn-md-gray" id="btnReset" onclick="resetStopColors()" disabled>↺ Reset Colors</button>
     </div>
 
+    <div class="canvas-note" id="canvasNote">Preview is an approximation — embroidery specialist confirms in Wilcom.</div>
+
   </div>
 
   <!-- ── RIGHT: Controls ── -->
   <div class="right">
 
-    <!-- Color stops -->
-    <div class="card stops-card">
-      <div class="card-title">
-        Color Stops
-        <button class="stops-toggle" id="stopsToggle" onclick="toggleStops()" title="Hide color stops">−</button>
-        <div class="tt-mini">
-          <button class="tt-mini-btn active" id="ttPoly" onclick="setThreadType('polyneon')">Polyneon</button>
-          <button class="tt-mini-btn" id="ttClass" onclick="setThreadType('classic')">Classic</button>
-        </div>
-      </div>
-      <div class="stop-list" id="stopList">
-        <div class="stops-empty">Load a DST file to see color stops</div>
-      </div>
-    </div>
-
     <!-- Logo details -->
     <div class="card">
-      <div class="card-title">Logo Details</div>
+      <div class="card-title">
+        Logo Details
+        <button class="stops-toggle" id="logoToggle" onclick="toggleLogo()" title="Hide logo details">▼</button>
+      </div>
+      <div id="logoContent">
 
       <div class="field-row">
         <label class="field-lbl">Customer / Account</label>
@@ -318,6 +309,22 @@ textarea.field-input{resize:vertical;min-height:65px;line-height:1.45}
       <div class="top-btn-row" style="margin-top:12px">
         <button class="btn-md btn-md-green" id="btnWS" onclick="downloadWorksheet()" disabled style="flex:1">↓ Download Worksheet</button>
         <button class="btn-md btn-md-gray" onclick="clearForm()">✕ Clear Form</button>
+      </div>
+      </div>
+    </div>
+
+    <!-- Color stops -->
+    <div class="card">
+      <div class="card-title">
+        Color Stops
+        <button class="stops-toggle" id="stopsToggle" onclick="toggleStops()" title="Hide color stops">▼</button>
+        <div class="tt-mini">
+          <button class="tt-mini-btn active" id="ttPoly" onclick="setThreadType('polyneon')">Polyneon</button>
+          <button class="tt-mini-btn" id="ttClass" onclick="setThreadType('classic')">Classic</button>
+        </div>
+      </div>
+      <div class="stop-list" id="stopList">
+        <div class="stops-empty">Load a DST file to see color stops</div>
       </div>
     </div>
 
@@ -1287,11 +1294,6 @@ function parseDST(buffer) {
       colorChanges++;
       out.push(x, y, 2);
     } else if ((b2 & 0x83) === 0x83) {           // JUMP/MOVE  (bits 0,1,7)
-      // v3.22 — split jumps by coord-weight bits. Small jumps (no
-      // weight bits in b2) can only reach ~5.6mm and are typical of
-      // sequin-chain spacing. Large jumps (b2 & 0x3C != 0) can reach
-      // ~12mm and are typically real positional moves between sections.
-      // Heuristic later promotes only small jumps in sequin-heavy stops.
       const isSmallJump = (b2 & 0x3C) === 0;
       out.push(x, y, isSmallJump ? 4 : 0);
     } else if ((b2 & 0x43) === 0x43) {           // SEQUIN / BLING drop event; cmd=3 so renderer can show it
@@ -1301,9 +1303,6 @@ function parseDST(buffer) {
       out.push(x, y, 1);                         // STITCH (default)
     }
   }
-  // Heuristic — in sequin-heavy stops, promote SMALL jumps (cmd=4)
-  // to sequins (cmd=3). Large jumps (cmd=0) stay as jumps. A stop
-  // is sequin-heavy if (small+large jumps) / (stitches+jumps) > 20%.
   (function promoteSequinHeavyJumps() {
     if (!out.length) return;
     const stops = [{stitches:0, smallJumps:0, largeJumps:0, sequins:0, smallIdx:[]}];
@@ -1320,17 +1319,11 @@ function parseDST(buffer) {
     for (const s of stops) {
       const denom = s.stitches + s.smallJumps + s.largeJumps;
       if (denom < 20) continue;
-      const jumpRatio = (s.smallJumps + s.largeJumps) / denom;
-      if (jumpRatio < 0.20) continue;
-      // Promote ONLY small jumps — large jumps are real positional moves
+      if ((s.smallJumps + s.largeJumps) / denom < 0.20) continue;
       for (const idx of s.smallIdx) { out[idx] = 3; promoted++; }
     }
     sequinCount += promoted;
-    // Demote any leftover cmd=4 (in non-sequin-heavy stops) back to cmd=0
-    // so the rest of the app treats them as ordinary jumps.
-    for (let k = 0; k + 2 < out.length; k += 3) {
-      if (out[k+2] === 4) out[k+2] = 0;
-    }
+    for (let k = 0; k + 2 < out.length; k += 3) if (out[k+2] === 4) out[k+2] = 0;
   })();
 
   return { data: out, colorChanges, sequinCount, wIn, hIn, wMM, hMM, wrapped, headerStart };
@@ -1394,27 +1387,38 @@ function loadFile(file) {
       res.hIn ? res.hIn + '"H' : null
     ].filter(Boolean).map(t => `<div class="stat-badge">${t}</div>`).join('');
 
-    // Banner logic (v3.21+): info banner for wrap detection, warning
-    // banner whenever sequins were detected OR file is wrapped.
+    // v3.24 — concise banners
     const ib = document.getElementById('infoBanner');
     if (res.wrapped) {
       ib.style.display = 'flex';
-      ib.innerHTML = '<span class="wb-ico">ℹ️</span><span><strong>Wilcom-wrapped DST detected</strong> — real stitch data found ' + res.headerStart.toLocaleString() + ' bytes into the file (behind a proprietary container). Stitches and color stops render correctly here.</span>';
+      ib.innerHTML = '<span class="wb-ico">ℹ️</span><span><strong>Wilcom-wrapped DST.</strong> Stitch data starts ' + res.headerStart.toLocaleString() + ' bytes in. Decorations stored in wrapper metadata aren\'t visible here.</span>';
     } else {
       ib.style.display = 'none';
     }
 
     const wb = document.getElementById('warnBanner');
-    const hasSequins     = res.sequinCount > 0;
+    const hasSequins = res.sequinCount > 0;
     const wrappedWithout = res.wrapped && !hasSequins;
     if (hasSequins) {
       wb.style.display = 'flex';
-      wb.innerHTML = '<span class="wb-ico">⚠️</span><span><strong>Potential issue — sequins / blings detected.</strong> Rhoback doesn\'t produce designs with sequins or rhinestones. This DST contains ' + res.sequinCount.toLocaleString() + ' drop record' + (res.sequinCount !== 1 ? 's' : '') + ' (rendered here as filled circles)' + (res.wrapped ? ', plus likely additional decorations in wrapper metadata we can\'t read' : '') + '. <strong>Open this file in Wilcom to verify</strong>, and confirm with the customer before sending to production.</span>';
+      wb.innerHTML = '<span class="wb-ico">⚠️</span><span><strong>Sequins / blings detected</strong> (' + res.sequinCount.toLocaleString() + ' drops). Rhoback doesn\'t produce these — verify in Wilcom and confirm with customer.</span>';
     } else if (wrappedWithout) {
       wb.style.display = 'flex';
-      wb.innerHTML = '<span class="wb-ico">⚠️</span><span><strong>Potential issue — wrapped DST file.</strong> Rhoback doesn\'t produce designs with sequins or rhinestones. This file\'s wrapper metadata may contain sequins, blings, or other decorations not visible in the preview above. <strong>Open this file in Wilcom to verify</strong> the full design, and confirm with the customer before sending to production.</span>';
+      wb.innerHTML = '<span class="wb-ico">⚠️</span><span><strong>Wrapped DST may hide sequins / blings.</strong> Rhoback doesn\'t produce these — verify full design in Wilcom.</span>';
     } else {
       wb.style.display = 'none';
+    }
+
+    // v3.24 — canvas caption: always-on note, swaps to warning chip when issues
+    const cn = document.getElementById('canvasNote');
+    if (cn) {
+      if (hasSequins || res.wrapped) {
+        cn.className = 'canvas-note warn';
+        cn.innerHTML = '⚠ Preview may not be 100% accurate ' + (hasSequins ? '— sequins detected. ' : '— wrapped file may hide decorations. ') + 'Embroidery specialist confirms in Wilcom.';
+      } else {
+        cn.className = 'canvas-note';
+        cn.innerHTML = 'Preview is an approximation — embroidery specialist confirms in Wilcom.';
+      }
     }
 
     // Set thread count dropdown
@@ -1551,8 +1555,20 @@ function toggleStops() {
   const list = document.getElementById('stopList');
   const btn  = document.getElementById('stopsToggle');
   list.style.display = stopsHidden ? 'none' : '';
-  btn.textContent = stopsHidden ? '+' : '−';
+  btn.textContent = stopsHidden ? '▶' : '▼';
   btn.title = stopsHidden ? 'Show color stops' : 'Hide color stops';
+}
+
+/* Toggle show/hide of the logo details content */
+let logoHidden = false;
+function toggleLogo() {
+  logoHidden = !logoHidden;
+  const list = document.getElementById('logoContent');
+  const btn  = document.getElementById('logoToggle');
+  if (!list || !btn) return;
+  list.style.display = logoHidden ? 'none' : '';
+  btn.textContent = logoHidden ? '▶' : '▼';
+  btn.title = logoHidden ? 'Show logo details' : 'Hide logo details';
 }
 
 /* ═══════════════════════════════════════════
@@ -1706,19 +1722,27 @@ function setBg(mode, btn) {
   redraw();
 }
 
-// Foggy / frosted-glass canvas background (radial gradient + soft top sheen)
+// Liquid Glass canvas background — light, translucent, iOS-style.
 function drawFrostedGlassBg(c, W, H) {
-  const g = c.createRadialGradient(W*0.5, H*0.35, 0, W*0.5, H*0.5, Math.max(W,H)*0.75);
-  g.addColorStop(0,   'rgba(252,253,255,0.95)');
-  g.addColorStop(0.55,'rgba(228,233,242,0.88)');
-  g.addColorStop(1,   'rgba(206,213,226,0.82)');
-  c.fillStyle = g; c.fillRect(0, 0, W, H);
-  // very soft top sheen for a glassy feel
-  const s = c.createLinearGradient(0, 0, 0, H);
-  s.addColorStop(0,   'rgba(255,255,255,0.20)');
-  s.addColorStop(0.45,'rgba(255,255,255,0)');
-  s.addColorStop(1,   'rgba(255,255,255,0)');
-  c.fillStyle = s; c.fillRect(0, 0, W, H);
+  c.fillStyle = 'rgba(247,250,255,0.72)';
+  c.fillRect(0, 0, W, H);
+  const top = c.createLinearGradient(0, 0, 0, H * 0.55);
+  top.addColorStop(0,   'rgba(255,255,255,0.55)');
+  top.addColorStop(0.5, 'rgba(255,255,255,0.18)');
+  top.addColorStop(1,   'rgba(255,255,255,0)');
+  c.fillStyle = top; c.fillRect(0, 0, W, H * 0.55);
+  const hi = c.createRadialGradient(W*0.28, H*0.22, 0, W*0.28, H*0.22, W*0.55);
+  hi.addColorStop(0, 'rgba(255,255,255,0.35)');
+  hi.addColorStop(1, 'rgba(255,255,255,0)');
+  c.fillStyle = hi; c.fillRect(0, 0, W, H);
+  const bot = c.createLinearGradient(0, H*0.6, 0, H);
+  bot.addColorStop(0, 'rgba(210,222,245,0)');
+  bot.addColorStop(1, 'rgba(195,212,240,0.32)');
+  c.fillStyle = bot; c.fillRect(0, H*0.6, W, H*0.4);
+  const edge = c.createLinearGradient(W*0.88, 0, W, 0);
+  edge.addColorStop(0, 'rgba(230,225,250,0)');
+  edge.addColorStop(1, 'rgba(220,215,250,0.18)');
+  c.fillStyle = edge; c.fillRect(W*0.88, 0, W*0.12, H);
 }
 
 // W × H dimension label (bottom-right pill). Drawn on canvas AND PNG.
@@ -1789,7 +1813,7 @@ function redraw() {
   for (let i = 0; i < stitchData.length; i += 3) {
     const rx2 = stitchData[i], ry2 = stitchData[i+1], cmd = stitchData[i+2];
     if (cmd === 2) { ci = Math.min(ci+1, colors.length-1); px=py=null; continue; }
-    if (cmd === 0 || cmd === 3 || cmd === 4) { px=py=null; continue; }   // jump, sequin, or small-jump all break the line
+    if (cmd === 0 || cmd === 3 || cmd === 4) { px=py=null; continue; }
 
     const cx = (rx2-x0)*sc + xOff;
     const cy = (ry2-y0)*sc + yOff;
@@ -1927,7 +1951,7 @@ function getCanvasDataURL() {
   for (let i = 0; i < stitchData.length; i += 3) {
     const rx2=stitchData[i], ry2=stitchData[i+1], cmd=stitchData[i+2];
     if (cmd===2){ci=Math.min(ci+1,colors.length-1);px=py=null;continue;}
-    if (cmd===0 || cmd===3 || cmd===4){px=py=null;continue;}   // jump, sequin, small-jump all break
+    if (cmd===0 || cmd===3 || cmd===4){px=py=null;continue;}
     const cx=(rx2-x0)*sc+xOff, cy=(ry2-y0)*sc+yOff;
     if (px!==null){
       offCtx.beginPath();offCtx.moveTo(px+.5,py+.5);offCtx.lineTo(cx+.5,cy+.5);
@@ -1990,6 +2014,8 @@ function clearForm() {
   sr.innerHTML = '';
   document.getElementById('infoBanner').style.display = 'none';
   document.getElementById('warnBanner').style.display = 'none';
+  const cnReset = document.getElementById('canvasNote');
+  if (cnReset) { cnReset.className = 'canvas-note'; cnReset.innerHTML = 'Preview is an approximation — embroidery specialist confirms in Wilcom.'; }
 
   // Reset color stops
   document.getElementById('stopList').innerHTML = '<div class="stops-empty">Load a DST file to see color stops</div>';
